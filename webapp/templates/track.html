@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ track_name }} track{% endblock %}
+{% block content %}
+  <p><a href="{{ url_for('dashboard') }}">&larr; All tracks</a></p>
+  <h1>{{ track_name }} track</h1>
+  <ol class="lesson-list">
+    {% for lesson in lessons %}
+      <li class="{{ 'done' if lesson.done else '' }}">
+        <a href="{{ url_for('lesson_view', track=track_key, slug=lesson.slug) }}">
+          {{ lesson.title }}
+        </a>
+        <p>{{ lesson.summary }}</p>
+        {% if lesson.done %}<span class="badge">Completed</span>{% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+{% endblock %}

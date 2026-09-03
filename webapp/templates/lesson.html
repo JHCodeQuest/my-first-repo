@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ lesson.title }}{% endblock %}
+{% block content %}
+  <p><a href="{{ url_for('track_view', track=track_key) }}">&larr; {{ track_name }} track</a></p>
+  <h1>{{ lesson.title }}</h1>
+  <article>{{ lesson.html | safe }}</article>
+  {% if not done %}
+    <form method="post" action="{{ url_for('mark_complete', track=track_key, slug=slug) }}">
+      <button type="submit">Mark as complete</button>
+    </form>
+  {% else %}
+    <p class="badge">Completed</p>
+  {% endif %}
+{% endblock %}

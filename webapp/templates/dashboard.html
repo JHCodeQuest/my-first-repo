@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+  <h1>Choose a track</h1>
+  <p>Each track is independent — progress in one doesn't affect the other.</p>
+  <div class="tracks">
+    {% for track in tracks %}
+      <a class="track-card track-{{ track.key }}" href="{{ url_for('track_view', track=track.key) }}">
+        <h2>{{ track.name }}</h2>
+        <p>{{ track.done }} / {{ track.total }} lessons complete</p>
+      </a>
+    {% endfor %}
+  </div>
+{% endblock %}
