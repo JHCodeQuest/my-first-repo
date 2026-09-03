@@ -1,1 +1,4 @@
 .env
+platform/progress.db
+__pycache__/
+*.pyc
