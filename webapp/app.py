@@ -61,9 +61,16 @@ def load_lesson(track, slug):
 
 
 def completed_slugs(track):
+    """Completed slugs that still correspond to a lesson that exists.
+
+    Intersecting with the lessons on disk keeps counts honest when a lesson
+    file is renamed or removed after someone completed it.
+    """
     db = get_db()
     rows = db.execute("SELECT slug FROM completed WHERE track = ?", (track,))
-    return {row[0] for row in rows}
+    recorded = {row[0] for row in rows}
+    existing = {lesson["slug"] for lesson in load_lessons(track)}
+    return recorded & existing
 
 
 @app.route("/")
@@ -115,6 +122,8 @@ def lesson_view(track, slug):
 @app.route("/track/<track>/<slug>/complete", methods=["POST"])
 def mark_complete(track, slug):
     if track not in TRACKS:
+        abort(404)
+    if not (CONTENT_DIR / track / f"{slug}.md").exists():
         abort(404)
     db = get_db()
     db.execute(

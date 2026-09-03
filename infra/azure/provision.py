@@ -9,7 +9,9 @@ Safety by design:
 """
 import os
 import sys
+import uuid
 
+from azure.core.exceptions import ResourceNotFoundError
 from azure.identity import ClientSecretCredential
 from azure.mgmt.resource import ResourceManagementClient
 from azure.mgmt.storage import StorageManagementClient
@@ -19,7 +21,9 @@ load_dotenv()
 
 RESOURCE_GROUP = "security-lab-rg"
 LOCATION = "eastus"
-STORAGE_ACCOUNT_NAME = "securitylabstorage001"
+# Azure storage account names are globally unique across all of Azure, so a
+# fixed name would collide with anyone else running this repo. Suffix it.
+STORAGE_ACCOUNT_NAME = f"seclab{uuid.uuid4().hex[:16]}"
 
 
 def get_credential():
@@ -41,10 +45,31 @@ def main():
     credential = get_credential()
 
     resource_client = ResourceManagementClient(credential, subscription_id)
-    resource_client.resource_groups.create_or_update(
-        RESOURCE_GROUP,
-        {"location": LOCATION, "tags": {"purpose": "security-lab"}},
-    )
+
+    # Never adopt a resource group we didn't create. If one already exists
+    # under this name, claiming it would also tag it "purpose=security-lab",
+    # which is exactly what destroy.py uses to decide it is safe to delete.
+    # Adopting a pre-existing group would therefore arm destroy.py to wipe
+    # resources that are not ours.
+    try:
+        existing = resource_client.resource_groups.get(RESOURCE_GROUP)
+    except ResourceNotFoundError:
+        existing = None
+
+    if existing is not None:
+        tags = existing.tags or {}
+        if tags.get("purpose") != "security-lab":
+            sys.exit(
+                f"Refusing to run: resource group '{RESOURCE_GROUP}' already "
+                "exists and was not created by this lab. Delete it yourself "
+                "or change RESOURCE_GROUP in this script before continuing."
+            )
+        print(f"Reusing existing lab resource group '{RESOURCE_GROUP}'.")
+    else:
+        resource_client.resource_groups.create_or_update(
+            RESOURCE_GROUP,
+            {"location": LOCATION, "tags": {"purpose": "security-lab"}},
+        )
 
     storage_client = StorageManagementClient(credential, subscription_id)
     poller = storage_client.storage_accounts.begin_create(

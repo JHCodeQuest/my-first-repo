@@ -13,21 +13,21 @@ infrastructure, separate credentials — so they never compete for the same
 space.
 
 ```
-platform/   Flask app: dashboard, lessons, progress tracking
-infra/aws/  Guarded scripts to spin up a real, isolated AWS lab (optional)
+webapp/      Flask app: dashboard, lessons, progress tracking
+infra/aws/   Guarded scripts to spin up a real, isolated AWS lab (optional)
 infra/azure/ Guarded scripts to spin up a real, isolated Azure lab (optional)
 ```
 
 ### Run the platform
 
 ```bash
-cd platform
+cd webapp
 pip install -r requirements.txt
 python3 app.py
 ```
 
 Then open http://127.0.0.1:5000 in a browser. Progress is stored locally
-in `platform/progress.db` (ignored by git).
+in `webapp/progress.db` (ignored by git).
 
 ### Optional: real cloud labs
 

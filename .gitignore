@@ -1,4 +1,5 @@
 .env
-platform/progress.db
+webapp/progress.db
+infra/aws/.lab-state
 __pycache__/
 *.pyc

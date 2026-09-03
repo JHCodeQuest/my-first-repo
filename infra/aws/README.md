@@ -33,6 +33,9 @@ web app.
      can't trigger it by accident.
 5. When you're done experimenting, **always run** `python3 destroy.py` to
    tear down every resource it created and avoid ongoing charges.
+   - `provision.py` saves the generated bucket name to a local `.lab-state`
+     file (gitignored), so `destroy.py` needs no arguments. You can also
+     name the bucket explicitly: `python3 destroy.py security-lab-1234567890`.
 
 ## What it creates
 

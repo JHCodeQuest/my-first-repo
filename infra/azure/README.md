@@ -34,10 +34,16 @@ wired into the web app.
 5. When you're done experimenting, **always run** `python3 destroy.py` to
    delete the whole lab resource group and avoid ongoing charges.
 
+Both scripts refuse to touch a `security-lab-rg` that already existed
+before you ran `provision.py` — `destroy.py` only deletes a resource group
+carrying the `purpose=security-lab` tag, and `provision.py` will not apply
+that tag to a group it didn't create.
+
 ## What it creates
 
 One resource group (`security-lab-rg`) containing a single Storage
-Account with "Allow Blob public access" left **disabled**, so you can
+Account (with a randomly generated globally-unique name) with "Allow Blob
+public access" left **disabled**, so you can
 safely practice the storage-exposure lesson from the platform (e.g.
 temporarily enabling public access yourself to see how Defender for Cloud
 flags it, then disabling it again) without any real data ever being

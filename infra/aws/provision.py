@@ -9,6 +9,7 @@ Safety by design:
 import os
 import sys
 import time
+from pathlib import Path
 
 import boto3
 from dotenv import load_dotenv
@@ -16,6 +17,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BUCKET_NAME = f"security-lab-{int(time.time())}"
+# destroy.py reads this so teardown works even if you lose the terminal
+# output. The lab IAM policy deliberately grants no ListAllMyBuckets, so
+# without this file the bucket name would be unrecoverable.
+STATE_FILE = Path(__file__).parent / ".lab-state"
 
 
 def main():
@@ -54,8 +59,10 @@ def main():
         Body=b"This is a lab placeholder object, not real data.",
     )
 
+    STATE_FILE.write_text(f"{BUCKET_NAME}\n")
+
     print(f"Created bucket: {BUCKET_NAME} (Block Public Access: ON)")
-    print("Run destroy.py with this bucket name when you're done.")
+    print("When you're done, tear it down with:  python3 destroy.py")
 
 
 if __name__ == "__main__":

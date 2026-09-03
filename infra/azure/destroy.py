@@ -2,6 +2,7 @@
 import os
 import sys
 
+from azure.core.exceptions import ResourceNotFoundError
 from azure.identity import ClientSecretCredential
 from azure.mgmt.resource import ResourceManagementClient
 from dotenv import load_dotenv
@@ -20,7 +21,12 @@ def main():
     )
 
     resource_client = ResourceManagementClient(credential, subscription_id)
-    rg = resource_client.resource_groups.get(RESOURCE_GROUP)
+    try:
+        rg = resource_client.resource_groups.get(RESOURCE_GROUP)
+    except ResourceNotFoundError:
+        print(f"Nothing to do: resource group '{RESOURCE_GROUP}' does not exist.")
+        return
+
     if rg.tags is None or rg.tags.get("purpose") != "security-lab":
         sys.exit(
             f"Refusing to delete '{RESOURCE_GROUP}': missing the "
